@@ -1,0 +1,42 @@
+version: "3.3"
+
+services:
+    nginx:
+        build:
+            context: .
+            dockerfile: docker/Nginx.Dockerfile
+        ports:
+            - 8000:80
+        links:
+            - fpm
+        volumes:
+            - ./:/var/www/ZohoCrmBorovskiy
+    fpm:
+        build:
+            context: .
+            dockerfile: docker/fpm.Dockerfile
+        volumes:
+            - ./:/var/www/ZohoCrmBorovskiy
+        working_dir: /var/www/ZohoCrmBorovskiy
+    mysql:
+        image: mysql:8.0
+        ports:
+            - 33061:3306
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=paybacksagelocal
+    composer:
+        build:
+            context: .
+            dockerfile: docker/composer.Dockerfile
+        volumes:
+            - ./:/var/www/ZohoCrmBorovskiy
+    node:
+        image: node:16
+        working_dir: /var/www/ZohoCrmBorovskiy
+        ports:
+            - 5173:5173
+        volumes:
+            - ./:/var/www/ZohoCrmBorovskiy
+        command: "npm run dev"
+
