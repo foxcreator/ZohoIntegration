@@ -8,8 +8,8 @@ class SpaController extends Controller
 {
     public function index()
     {
-        if (!session('access_token')) {
-            return redirect()->route('zoho');
+        if (!cache('access_token')) {
+            return redirect()->route('zoho.token');
         }
         return view('vue.index');
     }

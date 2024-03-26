@@ -19,3 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/deals/create', [\App\Http\Controllers\B2C\DealsController::class, 'store']);
+Route::get('/deals/stages', [\App\Http\Controllers\B2C\DealsController::class, 'getStages']);
+Route::get('/deals/accounts', [\App\Http\Controllers\B2C\DealsController::class, 'getAccounts']);
+Route::get('/deals/owner-id', [\App\Http\Controllers\B2C\DealsController::class, 'getOwnerId']);
+
+Route::post('/accounts/create', [\App\Http\Controllers\B2C\AccountsController::class, 'store']);

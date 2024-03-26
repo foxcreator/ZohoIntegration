@@ -3,21 +3,20 @@
 namespace app\Services\ZohoServices\Abstract;
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Session;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Cache;
 use Mockery\Exception;
-use function Laravel\Prompts\select;
 
-abstract class ZohoConnector
+class ZohoConnector
 {
     const ACCOUNTS_URL = 'https://accounts.zoho.eu';
     const REDIRECT_URI = 'http://localhost:8000/zoho/callback';
     const API_DOMAIN = 'https://www.zohoapis.eu';
 
-
     public static function getAccessToken()
     {
-        $grantToken = session('grant_token');
-        $refreshToken = session('refresh_token');
+        $grantToken = cache('grant_token');
+        $refreshToken = cache('refresh_token');
 
         $token = $refreshToken ?: $grantToken;
         $grantType = $refreshToken ? 'refresh_token' : 'authorization_code';
@@ -46,13 +45,12 @@ abstract class ZohoConnector
 
             $responseData = json_decode($response->getBody(), true);
 
-            Session::put('access_token', $responseData['access_token']);
-            Session::put('access_token_expiry', now()->addHour()->format('H:i:s'));
+            Cache::put('access_token', $responseData['access_token']);
+            Cache::put('access_token_expiry', now()->addHour());
 
             if (isset($responseData['refresh_token'])) {
-                Session::put('refresh_token', $responseData['refresh_token']);
+                Cache::put('refresh_token', $responseData['refresh_token']);
             }
-            Session::save();
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -60,8 +58,9 @@ abstract class ZohoConnector
 
     public static function isExpiredToken()
     {
-        if (session('access_token') && session('access_token_expiry')) {
-            if (now()->gt(session('access_token_expiry'))) {
+
+        if (cache('access_token') && cache('access_token_expiry')) {
+            if (now()->gt(cache('access_token_expiry'))) {
                 self::getAccessToken();
             }
         }
@@ -72,7 +71,7 @@ abstract class ZohoConnector
         self::isExpiredToken();
         $headers = [
             'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer ' . session('access_token')
+            'Authorization' => 'Bearer ' . cache('access_token')
         ];
 
         $url = self::API_DOMAIN . $endPoint;
@@ -84,33 +83,29 @@ abstract class ZohoConnector
             'json' => $data
         ]);
 
-        dd($response->getBody()->getContents());
+        return $response->getStatusCode();
     }
 
-    public static function getOwnerId()
-    {
-        self::isExpiredToken();
-        $headers = [
-            'Authorization' => 'Bearer ' . session('access_token')
-        ];
-
-        $url = self::API_DOMAIN . '/crm/v2/users';
-
-        $client = new Client();
-
-        $response = $client->request('GET', $url, [
-            'headers' => $headers,
-            'query' => ['type' => 'ActiveUsers']
-        ]);
-
-        $user = json_decode($response->getBody()->getContents(), true);
-
-        return $user['users'][0]['id'];
-    }
-
+    /**
+     * @throws GuzzleException
+     */
     public static function getRecords($endPoint, array $query = [])
     {
         self::isExpiredToken();
+        $headers = [
+            'Authorization' => 'Bearer ' . cache('access_token'),
+            'Content-Type' => 'application/json'
+        ];
 
+        $url = self::API_DOMAIN . $endPoint;
+
+
+        $client = new Client();
+        $response = $client->request('GET', $url, [
+            'headers' => $headers,
+            'query' => $query,
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
     }
 }
