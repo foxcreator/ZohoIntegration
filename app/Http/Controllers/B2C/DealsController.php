@@ -4,34 +4,32 @@ namespace App\Http\Controllers\B2C;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateDealRequest;
-use App\Http\Resources\StageResource;
 use App\Services\ZohoServices\AccountService;
 use App\Services\ZohoServices\DealService;
 use App\Services\ZohoServices\LayoutsService;
 use App\Services\ZohoServices\OwnerService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 
 class DealsController extends Controller
 {
-    public function getStages()
+    public function getStages(): JsonResponse
     {
         $stages = LayoutsService::getDealStages();
         return response()->json($stages);
     }
 
-    public function getAccounts()
+    public function getAccounts(): JsonResponse
     {
         $accounts = AccountService::getAccounts();
         return response()->json($accounts);
     }
 
-    public function getOwnerId()
+    public function getOwnerId(): JsonResponse
     {
         return response()->json(OwnerService::getOwnerId());
     }
 
-    public function store(CreateDealRequest $request)
+    public function store(CreateDealRequest $request): JsonResponse
     {
         $formData = $request->validated();
 

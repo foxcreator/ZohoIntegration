@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class SpaController extends Controller
 {
-    public function index()
+    public function index(): mixed
     {
         if (!cache('access_token')) {
             return redirect()->route('zoho.token');

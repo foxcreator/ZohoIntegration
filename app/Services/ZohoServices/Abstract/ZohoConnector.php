@@ -13,7 +13,7 @@ class ZohoConnector
     const REDIRECT_URI = 'http://localhost:8000/zoho/callback';
     const API_DOMAIN = 'https://www.zohoapis.eu';
 
-    public static function getAccessToken()
+    public static function getAccessToken(): void
     {
         $grantToken = cache('grant_token');
         $refreshToken = cache('refresh_token');
@@ -56,9 +56,8 @@ class ZohoConnector
         }
     }
 
-    public static function isExpiredToken()
+    public static function isExpiredToken(): void
     {
-
         if (cache('access_token') && cache('access_token_expiry')) {
             if (now()->gt(cache('access_token_expiry'))) {
                 self::getAccessToken();
@@ -66,7 +65,7 @@ class ZohoConnector
         }
     }
 
-    public static function insertRecord($endPoint, array $data)
+    public static function insertRecord($endPoint, array $data): int
     {
         self::isExpiredToken();
         $headers = [

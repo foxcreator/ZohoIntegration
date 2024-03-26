@@ -3,12 +3,16 @@
 namespace App\Services\ZohoServices;
 
 use App\Services\ZohoServices\Abstract\ZohoConnector;
+use GuzzleHttp\Exception\GuzzleException;
 
 class LayoutsService
 {
     const LAYOUTS_END_POINT = '/crm/v2/settings/layouts';
 
-    public static function getDealStages() :array
+    /**
+     * @throws GuzzleException
+     */
+    public static function getDealStages(): array
     {
         $result = ZohoConnector::getRecords(self::LAYOUTS_END_POINT, ['module' => 'Deals']);
 

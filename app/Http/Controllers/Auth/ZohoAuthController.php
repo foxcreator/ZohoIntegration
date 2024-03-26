@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Services\ZohoServices\AccountService;
 use App\Http\Controllers\Controller;
 use App\Services\ZohoServices\Abstract\ZohoConnector;
-use App\Services\ZohoServices\LayoutsService;
-use App\Services\ZohoServices\OwnerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Session;
 
 class ZohoAuthController extends Controller
 {

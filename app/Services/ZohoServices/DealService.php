@@ -8,7 +8,7 @@ class DealService
 {
     const DEALS_END_POINT = '/crm/v2/Deals';
 
-    public static function insertDeal($data)
+    public static function insertDeal($data): int
     {
         return ZohoConnector::insertRecord(self::DEALS_END_POINT, $data);
     }
